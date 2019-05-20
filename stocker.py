@@ -873,7 +873,7 @@ class Stocker():
         # Plot the predictions and indicate if increase or decrease
         fig, ax = plt.subplots(1, 1, figsize=(8, 6))
 
-        # Plot the estimates
+        # Plot the estimates    
         ax.plot(future_increase['Date'], future_increase['estimate'], 'g^', ms = 12, label = 'Pred. Increase')
         ax.plot(future_decrease['Date'], future_decrease['estimate'], 'rv', ms = 12, label = 'Pred. Decrease')
 
@@ -979,3 +979,138 @@ class Stocker():
         plt.xticks(results['cps'], results['cps'])
         plt.legend(prop={'size':10})
         plt.show();
+
+    def auto_make_a_df(self, start_date=self.min_date, end_date=self.max_date,df=None):
+        '''
+            Added by Chris Louie for stockly
+        '''
+        # Default is to use the object stock data
+        if not df:
+            df = self.stock.copy()
+
+
+        start_date, end_date = self.handle_dates(start_date, end_date)
+
+        # keep track of whether the start and end dates are in the data
+        start_in = True
+        end_in = True
+
+        # If user wants to round dates (default behavior)
+        if self.round_dates:
+            # Record if start and end date are in df
+            if (start_date not in list(df['Date'])):
+                start_in = False
+            if (end_date not in list(df['Date'])):
+                end_in = False
+
+            # If both are not in dataframe, round both
+            if (not end_in) & (not start_in):
+                trim_df = df[(df['Date'] >= start_date) & 
+                             (df['Date'] <= end_date)]
+
+            else:
+                # If both are in dataframe, round neither
+                if (end_in) & (start_in):
+                    trim_df = df[(df['Date'] >= start_date) & 
+                                 (df['Date'] <= end_date)]
+                else:
+                    # If only start is missing, round start
+                    if (not start_in):
+                        trim_df = df[(df['Date'] > start_date) & 
+                                     (df['Date'] <= end_date)]
+                    # If only end is missing round end
+                    elif (not end_in):
+                        trim_df = df[(df['Date'] >= start_date) & 
+                                     (df['Date'] < end_date)]
+
+
+        else:
+            valid_start = False
+            valid_end = False
+            while (not valid_start) & (not valid_end):
+                start_date, end_date = self.handle_dates(start_date, end_date)
+
+                # No round dates, if either data not in, print message and return
+                if (start_date in list(df['Date'])):
+                    valid_start = True
+                if (end_date in list(df['Date'])):
+                    valid_end = True
+
+                # Check to make sure dates are in the data
+                if (start_date not in list(df['Date'])):
+                    print('Start Date not in data (either out of range or not a trading day.)')
+                    start_date = pd.to_datetime(input(prompt='Enter a new start date: '))
+
+                elif (end_date not in list(df['Date'])):
+                    print('End Date not in data (either out of range or not a trading day.)')
+                    end_date = pd.to_datetime(input(prompt='Enter a new end date: ') )
+
+            # Dates are not rounded
+            trim_df = df[(df['Date'] >= start_date) & 
+                         (df['Date'] <= end_date.date)]
+
+        up_days = []
+        down_days = []
+
+        for i in range(0,len(trim_df)):
+            if trim_df['Daily Change'][i] > 0:
+                up_days.append(1)
+                down_days.append(0)
+            elif trim_df['Daily Change'][i] < 0:
+                down_days.append(1)
+                up_days.append(0)
+            else:
+                down_days.append(0)
+                up_days.append(0)
+        print(len(up_days))
+        print(len(down_days))
+        trim_df['Up Days'] = up_days
+        trim_df['Down Days'] = down_days
+
+        return trim_df
+
+    def make_a_future_dataframe(self,periods=30,freq='D'):
+    '''
+        Added by Chris Louie for stockly
+    '''
+        train = self.stock[self.stock['Date'] > (max(self.stock['Date']) - pd.DateOffset(years=self.training_years))]
+
+        model = self.create_model()
+        model.fit(train)
+
+        future = model.make_future_dataframe(periods=periods,freq=freq)
+        future = model.predict(future)
+
+        preds = future[future['ds'] >= max(self.stock['Date'])]
+        preds = self.remove_weekends(preds)
+        preds['diff'] = preds['yhat'].diff()
+        preds = preds.dropna()
+        preds['direction'] = (preds['diff'] > 0) * 1
+        preds = preds.rename(columns={
+            'ds': 'Date', 'yhat': 'estimate', 'diff': 'change', 
+            'yhat_upper': 'upper', 'yhat_lower': 'lower'
+        })
+
+        up_days = []
+        down_days = []
+
+        for i in range(0,len(preds)):
+            if preds['estimate'][i] > 0:
+                up_days.append(1)
+                down_days.append(0)
+            elif preds['estimate'][i] < 0:
+                down_days.append(1)
+                up_days.append(0)
+            else:
+                down_days.append(0)
+                up_days.append(0)
+        print(len(up_days))
+        print(len(down_days))
+        preds['Up Days'] = up_days
+        preds['Down Days'] = down_days
+
+        return preds
+
+    
+
+    
