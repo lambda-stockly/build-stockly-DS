@@ -978,16 +978,19 @@ class Stocker():
         plt.grid(color='k', alpha=0.3)
         plt.xticks(results['cps'], results['cps'])
         plt.legend(prop={'size':10})
-        plt.show();
-
-    def auto_make_a_df(self, start_date=self.min_date, end_date=self.max_date,df=None):
+        plt.show()
+    
+    def auto_make_a_df(self,start_date=None, end_date=None,df=None):
         '''
             Added by Chris Louie for stockly
         '''
         # Default is to use the object stock data
+        if start_date is None:
+            start_date = self.min_date
+        if end_date is None:
+            end_date = self.max_date
         if not df:
             df = self.stock.copy()
-
 
         start_date, end_date = self.handle_dates(start_date, end_date)
 
@@ -1070,9 +1073,9 @@ class Stocker():
         return trim_df
 
     def make_a_future_dataframe(self,periods=30,freq='D'):
-    '''
-        Added by Chris Louie for stockly
-    '''
+        '''
+            Added by Chris Louie for stockly
+        '''
         train = self.stock[self.stock['Date'] > (max(self.stock['Date']) - pd.DateOffset(years=self.training_years))]
 
         model = self.create_model()
@@ -1091,10 +1094,12 @@ class Stocker():
             'yhat_upper': 'upper', 'yhat_lower': 'lower'
         })
 
+        preds = preds.reset_index()
+
         up_days = []
         down_days = []
 
-        for i in range(0,len(preds)):
+        for i in range(len(preds)):
             if preds['estimate'][i] > 0:
                 up_days.append(1)
                 down_days.append(0)
