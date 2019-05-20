@@ -6,7 +6,7 @@ import pandas_datareader.data as web
 from alpha_vantage.timeseries import TimeSeries
 import os
 
-class DailyPredict():
+class PredictDaily():
     '''
         original script from :
         https://github.com/WillKoehrsen/Data-Analysis/blob/master/stocker/stocker.py
