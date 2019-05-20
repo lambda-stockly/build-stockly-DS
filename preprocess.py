@@ -1,8 +1,6 @@
 import fbprophet
 import pandas as pd
 import numpy as np
-import pytrends
-import pandas_datareader.data as web
 from alpha_vantage.timeseries import TimeSeries
 import os
 
@@ -15,11 +13,12 @@ class PredictDaily():
     #Initialize parameters
     def __init__(self, ticker):
 
+        ALPHAVANTAGE_API_KEY = ''
+
+        ts = TimeSeries(key='0GOYV58FN3FF3CO2', output_format='pandas')
+
         ticker = ticker.upper()
         self.symbol = ticker
-        self.api_key = os.getenv('ALPHAVANTAGE_API_KEY')
-
-        ts = TimeSeries(key=self.api_key, output_format='pandas')
 
         try:
             data, meta_data = ts.get_daily(self.symbol, outputsize='fill')
@@ -401,8 +400,6 @@ class PredictDaily():
             print('The Buy and Hold strategy profit =         ${:.2f}.'.format(float(test.loc[test.index[-1], 'hold_profit'])))
             print('\nThanks for playing the stock market!\n')
 
-
-
             # Plot the predicted and actual profits over time
 
             # Final profit and final smart used for locating text
@@ -412,6 +409,8 @@ class PredictDaily():
             # text location
             last_date = test.loc[test.index[-1], 'ds']
             text_location = (last_date - pd.DateOffset(months = 1))
+
+        return test
 
     def make_a_future_dataframe(self,periods=30,freq='D'):
         '''
@@ -458,7 +457,7 @@ class PredictDaily():
         return preds
 
     # Predict the future price for a given range of days
-    def predict_future(self, days=30):
+    def predict_future(self, days=7):
 
         # Use past self.training_years years for training
         train = self.stock[self.stock['Date'] > (max(self.stock['Date']) - pd.DateOffset(years=self.training_years))]
@@ -498,5 +497,7 @@ class PredictDaily():
 
         print('\nPredicted Decrease: \n')
         print(future_decrease[['Date', 'estimate', 'change', 'upper', 'lower']])
+
+        return future
 
 
