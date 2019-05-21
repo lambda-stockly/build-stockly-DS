@@ -500,4 +500,36 @@ class Process():
 
         return future
 
+    def output(self):
+        '''
+            This method is for storing an output for the predict_future method.
+            Create softmax probability for whether player should buy hold or sell
+        '''
+
+        def softmax(x):
+            """Compute softmax values for each sets of scores in x."""
+            return np.exp(x) / np.sum(np.exp(x), axis=0)
+
+        future_model = self.predict_future()
+        average_delta = np.mean(future_model['change'])
+        hold = []
+
+        buy = sum(future_model['direction'] == 1)
+        sell = sum(future_model['direction'] == 0)
+
+        if average_delta > 1:
+            print('doing some calculations here')
+            hold.append(average_delta)
+        elif average_delta < -1:
+            hold.append(-average_delta)
+        else:
+            hold.append(buy+sell+average_delta)
+
+        scores = [buy,sell,hold]
+        softmax_scores = softmax(scores)
+        keys = ['Buy','Sell','Hold']
+
+        output = dict(zip(keys,zip(*softmax_scores)))
+
+        return output
 
