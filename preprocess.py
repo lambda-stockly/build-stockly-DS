@@ -4,7 +4,7 @@ import numpy as np
 from alpha_vantage.timeseries import TimeSeries
 import os
 
-class PredictDaily():
+class Process():
     '''
         original script from :
         https://github.com/WillKoehrsen/Data-Analysis/blob/master/stocker/stocker.py
@@ -13,15 +13,15 @@ class PredictDaily():
     #Initialize parameters
     def __init__(self, ticker):
 
-        ALPHAVANTAGE_API_KEY = ''
+        ALPHAVANTAGE_API_KEY = '0GOYV58FN3FF3CO2'
 
-        ts = TimeSeries(key='0GOYV58FN3FF3CO2', output_format='pandas')
+        ts = TimeSeries(key=ALPHAVANTAGE_API_KEY, output_format='pandas')
 
         ticker = ticker.upper()
         self.symbol = ticker
 
         try:
-            data, meta_data = ts.get_daily(self.symbol, outputsize='fill')
+            data, meta_data = ts.get_daily(self.symbol, outputsize='full')
 
         except Exception as e:
             print('Error retrieving Stock Data...')
@@ -29,7 +29,7 @@ class PredictDaily():
             return
 
         data = data.reset_index(level=0)
-
+        data['date'] = pd.to_datetime(data['date'])
         data['ds'] = data['date']
         data = data.rename(columns={
                 'date': 'Date', '1. open': 'Open', '2. high': 'High',
@@ -233,7 +233,7 @@ class PredictDaily():
         weekends = []
 
         # Find all of the weekends
-        for i, date in enumerate(dataframe['Date']):
+        for i, date in enumerate(dataframe['ds']):
             if (date.weekday()) == 5 | (date.weekday() == 6):
                 weekends.append(i)
 
@@ -457,7 +457,7 @@ class PredictDaily():
         return preds
 
     # Predict the future price for a given range of days
-    def predict_future(self, days=7):
+    def predict_future(self, days=30):
 
         # Use past self.training_years years for training
         train = self.stock[self.stock['Date'] > (max(self.stock['Date']) - pd.DateOffset(years=self.training_years))]
