@@ -1,5 +1,15 @@
 # build-stockly-DS
 
+# TODOs:
+
+- !!!!!!!!!!! Route methods listed below to the flaskapp
+- Sentiment script
+- Download tweets/reddit posts/news to train a model
+- Pickle said model to be used for the MVP
+- Delete useless notebooks
+- Create a clean notebook for examples and publications
+- Update README with necessary TODOs and whatnot
+
 ## Historical Usage
 
 ```python
