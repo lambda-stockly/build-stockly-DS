@@ -10,7 +10,7 @@
 - Create a clean notebook for examples and publications
 - Update README with necessary TODOs and whatnot
 
-## Historical Usage
+## Historical/Future Usage
 
 ```python
 from preprocess import Magic
