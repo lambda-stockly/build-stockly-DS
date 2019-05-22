@@ -4,7 +4,7 @@ import numpy as np
 from alpha_vantage.timeseries import TimeSeries
 import os
 
-class Historical():
+class Magic():
     '''
         original script from :
         https://github.com/WillKoehrsen/Data-Analysis/blob/master/stocker/stocker.py
@@ -13,7 +13,7 @@ class Historical():
     #Initialize parameters
     def __init__(self, ticker):
 
-        ALPHAVANTAGE_API_KEY = '0GOYV58FN3FF3CO2'
+        ALPHAVANTAGE_API_KEY = 'SXG08DL4S2EW8SKC'
 
         ts = TimeSeries(key=ALPHAVANTAGE_API_KEY, output_format='pandas')
 
@@ -500,7 +500,39 @@ class Historical():
 
         return future
 
-    def output(self):
+    def output_historical(self):
+        '''
+            This method is for storing an output for the predict_future method.
+            Create softmax probability for whether player should buy hold or sell
+        '''
+
+        def softmax(x):
+            """Compute softmax values for each sets of scores in x."""
+            e_x = np.exp(x - np.max(x))
+            return e_x / e_x.sum(axis=0)
+
+        output = self.make_a_df()
+        average_delta = np.mean(output['Daily Change'])
+
+        buy = sum(output['Up Days'] == 1)
+        sell = sum(output['Down Days'] == 1)
+
+        if average_delta > 1:
+            hold = average_delta
+        elif average_delta < -1:
+            hold = -average_delta
+        else:
+            hold = (buy+sell+average_delta)/3
+
+        scores = [sell,hold,buy]
+        values = softmax(scores)
+        keys = ['Sell','Hold','Buy']
+
+        historical_analysis = dict(zip(keys,values))
+
+        return historical_analysis
+
+    def output_future(self):
         '''
             This method is for storing an output for the predict_future method.
             Create softmax probability for whether player should buy hold or sell
@@ -528,9 +560,7 @@ class Historical():
         values = softmax(scores)
         keys = ['Sell','Hold','Buy']
 
-        historical_analysis = dict(zip(keys,values))
+        future_analysis = dict(zip(keys,values))
 
-        # output = dict(zip(keys,zip(*softmax_scores)))
-
-        return historical_analysis
+        return future_analysis
 

@@ -1,2 +1,24 @@
 # build-stockly-DS
-For our lovely DS team members. They think. They do math. They make algorithms. The rest is a mystery. But they do send parsable JSON data, and for that we are grateful. 
+
+## Historical Usage
+
+```python
+from preprocess import Magic
+
+# insert stock ticker to instantiate Historical object.
+
+tesla = Magic('TSLA')
+
+# two endpoint methods that return a dictionary of softmax scores in format:
+# {'Sell': 0.25, 'Hold': 0.5, 'Buy': '0.25'}
+
+# first method :output_historical:
+
+historical = tesla.output_historical()
+print(historical)
+
+# second method :output_future:
+
+future = tesla.output_future()
+print(future)
+```
