@@ -17,3 +17,8 @@ from gensim.models import Doc2Vec
 
 '''
 
+class Reddit():
+	def __init__(self):
+		'''
+			Fill in this area with code from our tests.
+		'''
