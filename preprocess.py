@@ -1,12 +1,10 @@
 import fbprophet
 import pandas as pd
 import numpy as np
-import pytrends
-import pandas_datareader.data as web
 from alpha_vantage.timeseries import TimeSeries
 import os
 
-class DailyPredict():
+class Historical():
     '''
         original script from :
         https://github.com/WillKoehrsen/Data-Analysis/blob/master/stocker/stocker.py
@@ -15,14 +13,15 @@ class DailyPredict():
     #Initialize parameters
     def __init__(self, ticker):
 
+        ALPHAVANTAGE_API_KEY = '0GOYV58FN3FF3CO2'
+
+        ts = TimeSeries(key=ALPHAVANTAGE_API_KEY, output_format='pandas')
+
         ticker = ticker.upper()
         self.symbol = ticker
-        self.api_key = os.getenv('ALPHAVANTAGE_API_KEY')
-
-        ts = TimeSeries(key=self.api_key, output_format='pandas')
 
         try:
-            data, meta_data = ts.get_daily(self.symbol, outputsize='fill')
+            data, meta_data = ts.get_daily(self.symbol, outputsize='full')
 
         except Exception as e:
             print('Error retrieving Stock Data...')
@@ -30,7 +29,7 @@ class DailyPredict():
             return
 
         data = data.reset_index(level=0)
-
+        data['date'] = pd.to_datetime(data['date'])
         data['ds'] = data['date']
         data = data.rename(columns={
                 'date': 'Date', '1. open': 'Open', '2. high': 'High',
@@ -234,7 +233,7 @@ class DailyPredict():
         weekends = []
 
         # Find all of the weekends
-        for i, date in enumerate(dataframe['Date']):
+        for i, date in enumerate(dataframe['ds']):
             if (date.weekday()) == 5 | (date.weekday() == 6):
                 weekends.append(i)
 
@@ -401,8 +400,6 @@ class DailyPredict():
             print('The Buy and Hold strategy profit =         ${:.2f}.'.format(float(test.loc[test.index[-1], 'hold_profit'])))
             print('\nThanks for playing the stock market!\n')
 
-
-
             # Plot the predicted and actual profits over time
 
             # Final profit and final smart used for locating text
@@ -412,6 +409,8 @@ class DailyPredict():
             # text location
             last_date = test.loc[test.index[-1], 'ds']
             text_location = (last_date - pd.DateOffset(months = 1))
+
+        return test
 
     def make_a_future_dataframe(self,periods=30,freq='D'):
         '''
@@ -499,4 +498,39 @@ class DailyPredict():
         print('\nPredicted Decrease: \n')
         print(future_decrease[['Date', 'estimate', 'change', 'upper', 'lower']])
 
+        return future
+
+    def output(self):
+        '''
+            This method is for storing an output for the predict_future method.
+            Create softmax probability for whether player should buy hold or sell
+        '''
+
+        def softmax(x):
+            """Compute softmax values for each sets of scores in x."""
+            e_x = np.exp(x - np.max(x))
+            return e_x / e_x.sum(axis=0)
+
+        future_model = self.predict_future()
+        average_delta = np.mean(future_model['change'])
+
+        buy = sum(future_model['direction'] == 1)
+        sell = sum(future_model['direction'] == 0)
+
+        if average_delta > 1:
+            hold = average_delta
+        elif average_delta < -1:
+            hold = -average_delta
+        else:
+            hold = (buy+sell+average_delta)/3
+
+        scores = [sell,hold,buy]
+        values = softmax(scores)
+        keys = ['Sell','Hold','Buy']
+
+        historical_analysis = dict(zip(keys,values))
+
+        # output = dict(zip(keys,zip(*softmax_scores)))
+
+        return historical_analysis
 

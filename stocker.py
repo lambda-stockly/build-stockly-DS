@@ -26,7 +26,7 @@ class Stocker():
         self.symbol = ticker
         
         # Use Personal Api Key
-        # quandl.ApiConfig.api_key = 'YourKeyHere'
+        quandl.ApiConfig.api_key = os.getenv('QUADL_KEY')
 
         # Retrieval the financial data
         try:
@@ -151,7 +151,6 @@ class Stocker():
         # Default is to use the object stock data
         if not df:
             df = self.stock.copy()
-        
         
         start_date, end_date = self.handle_dates(start_date, end_date)
         
