@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 from alpha_vantage.timeseries import TimeSeries
 import os
-import fbprophet
-from sklearn.model_selection import train_test_splits
 import tweepy
 import re
 import basilica
@@ -50,8 +48,13 @@ class TwitterSentiment():
                                              tweet_mode="extended",
                                              lang="en",
                                              ).items(max_tweets)]
+        df_tweets = [tweet.full_text for tweet in tweets]
+        df_embedding = []
+        for tweet in tweets:
+            embedding = self.basilica.embed_sentence(tweet, model='twitter')
 
-        data = pd.DataFrame(data=[tweet.text for tweet in tweets], columns=['Tweets'])
+
+        data = pd.DataFrame(data=, columns=['Tweets','Basilica'])
 
         return data
 
@@ -66,6 +69,7 @@ class TwitterSentiment():
             n_list.append(s_pol)
 
         series = pd.Series(n_list)
+
         df['polarity'] = series.values
 
         return df
@@ -73,6 +77,10 @@ class TwitterSentiment():
     def output_preds(self):
 
         df = self.nltk_magic()
+
+
+
+
 
 
 
