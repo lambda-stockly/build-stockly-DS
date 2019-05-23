@@ -2,13 +2,10 @@
 
 # TODOs:
 
-- !!!!!!!!!!! Route methods listed below to the flaskapp
-- Sentiment script
-- Download tweets/reddit posts/news to train a model
-- Pickle said model to be used for the MVP
-- Delete useless notebooks
-- Create a clean notebook for examples and publications
-- Update README with necessary TODOs and whatnot
+- Clean up repo
+- update repo with app.py
+- install dependencies to pipenv
+- commit changes to heroku
 
 ## Historical/Future Usage
 
@@ -20,7 +17,7 @@ from preprocess import Magic
 tesla = Magic('TSLA')
 
 # two endpoint methods that return a dictionary of softmax scores in format:
-# {'Sell': 0.25, 'Hold': 0.5, 'Buy': '0.25'}
+# {'Sell': 0.25, 'Hold': 0.5, 'Buy': 0.25}
 
 # first method :output_historical:
 
@@ -31,4 +28,19 @@ print(historical)
 
 future = tesla.output_future()
 print(future)
+```
+## TwitterSentiment Usage
+
+```python
+from sentiment import TwitterSentiment
+
+# same as above
+
+tesla = TwitterSentiment('TSLA')
+
+twitter_sentiment = tesla.output_twitter()
+print(twitter_sentiment)
+
+# should display :
+# {'Sell': 0.1, 'Hold': 0.3, 'Buy': 0.6}
 ```
