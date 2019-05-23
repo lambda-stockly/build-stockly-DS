@@ -68,7 +68,7 @@ class TwitterSentiment():
 
         return df
 
-    def output_preds(self):
+    def output_twitter(self):
 
         data = self.nltk_magic()
 
@@ -85,7 +85,25 @@ class TwitterSentiment():
             pos.append(pol[i]['pos'])
             compound.append(pol[i]['compound'])
 
+        def softmax(x):
+            """Compute softmax values for each sets of scores in x."""
+            e_x = np.exp(x - np.max(x))
+            return e_x / e_x.sum(axis=0)
 
+        scores = []
+
+        sell = sum(neg)
+        hold = sum(neu)
+        buy = sum(pos)
+        comp = sum(compound)
+
+        scores = [sell,hold,buy]
+        values = softmax(scores)
+        keys = ['Sell','Hold','Buy']
+
+        twitter_sentiment_analysis = dict(zip(keys,values))
+
+        return twitter_sentiment_analysis
 
 
 
