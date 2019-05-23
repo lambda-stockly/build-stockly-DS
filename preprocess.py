@@ -284,8 +284,6 @@ class Magic():
             print('Predicted Price on {} = ${:.2f}'.format(
                 future.loc[future.index[-1], 'ds'], future.loc[future.index[-1], 'yhat']))
 
-        # Set up the plot
-
         return model, future
 
     def evaluate_prediction(self, start_date=None, end_date=None, nshares = None):
