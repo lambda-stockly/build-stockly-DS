@@ -13,7 +13,13 @@ class Magic():
     #Initialize parameters
     def __init__(self, ticker):
 
-        ALPHAVANTAGE_API_KEY = 'SXG08DL4S2EW8SKC'
+        # might need to initialize with a local variable that stores the actual key
+        # otherwise os.getenv() will look for the environment variable
+        # and if the name of the environment variable is not the same
+        # then this will not work!!!
+        # ALPHAVANTAGE_API_KEY = 'SXG08DL4S2EW8SKC'
+
+        ALPHAVANTAGE_API_KEY = os.getenv('ALPHAVANTAGE_API_KEY')
 
         ts = TimeSeries(key=ALPHAVANTAGE_API_KEY, output_format='pandas')
 
@@ -277,8 +283,6 @@ class Magic():
             # Print the predicted price
             print('Predicted Price on {} = ${:.2f}'.format(
                 future.loc[future.index[-1], 'ds'], future.loc[future.index[-1], 'yhat']))
-
-        # Set up the plot
 
         return model, future
 
