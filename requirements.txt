@@ -5,3 +5,4 @@ nltk==3.4.1
 pandas==0.24.2
 tweepy==3.7.0
 Flask==1.0.3
+scikit-learn==0.20.3

@@ -23,57 +23,43 @@ class TwitterSentiment():
                                       os.getenv('ACCESS_SECRET'))
 
         self.api = tweepy.API(TWITTER_AUTH)
-
-        # Basilica.ai
         self.ticker = ticker.upper()
-        self.sid = SentimentIntensityAnalyzer()
 
-    def make_df(self):
+    def make_df_with_magic(self):
 
-        max_tweets=1000
-        tweets = [status for status in tweepy.Cursor(self.api.search,
-                                             q=self.ticker,
-                                             result_type="recent",
-                                             tweet_mode="extended",
-                                             lang="en",
-                                             ).items(max_tweets)]
-        df_tweets = [tweet.full_text for tweet in tweets]
-        # df_embedding = []
-        # for tweet in tweets:
-        #     embedding = self.basilica.embed_sentence(tweet, model='twitter')
-        #     df_embedding.append(embedding)
+        api = self.api
+        symbol = self.ticker
+        sid = SentimentIntensityAnalyzer()
+        max_tweets = 200
 
-        data = pd.DataFrame(data=df_tweets, columns=['Tweets'])
-        # data['Embedding'] = df_embedding
+        tweets = [status for status in tweepy.Cursor(api.search,
+                                                     q=symbol,
+                                                     result_type="recent",
+                                                     tweet_mode="extended",
+                                                     lang="en").items(max_tweets)]
 
-        return data
-
-    def nltk_magic(self):
-
-        df = self.make_df()
+        data = pd.DataFrame(data=[tweet.full_text for tweet in tweets], columns = ['Tweets'])
         n_list = []
 
-        for index, row in df.iterrows():
-            s_pol = self.sid.polarity_scores(row['Tweets'])
-            s_pol = dict()
+        for index, row in data.iterrows():
+            s_pol = sid.polarity_scores(row['Tweets'])
             n_list.append(s_pol)
 
         series = pd.Series(n_list)
+        data['polarity'] = series.values
 
-        df['polarity'] = series.values
-
-        return df
+        return data
 
     def output_twitter(self):
 
-        data = self.nltk_magic()
+        data = self.make_df_with_magic()
 
         neg = []
         neu = []
         pos = []
         compound = []
 
-        pol = data['polarity'].values
+        pol = data['polarity']
 
         for i in range(0, len(pol)):
             neg.append(pol[i]['neg'])
@@ -86,38 +72,16 @@ class TwitterSentiment():
             e_x = np.exp(x - np.max(x))
             return e_x / e_x.sum(axis=0)
 
-        scores = []
-
         sell = sum(neg)
-        hold = sum(neu)
+        # hold = sum(neu)
         buy = sum(pos)
         comp = sum(compound)
 
-        scores = [sell,hold,buy]
+        scores = [sell, comp, buy]
         values = softmax(scores)
-        keys = ['Sell','Hold','Buy']
+        keys = ['Sell', 'Hold', 'Buy']
 
-        twitter_sentiment_analysis = dict(zip(keys,values))
+        twitter_sentiment_analysis = dict(zip(keys, values))
 
         return twitter_sentiment_analysis
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
