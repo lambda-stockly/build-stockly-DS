@@ -84,3 +84,4 @@ class TwitterSentiment():
         twitter_sentiment_analysis = dict(zip(keys, values))
 
         return twitter_sentiment_analysis
+

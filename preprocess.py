@@ -75,14 +75,13 @@ class Magic():
         self.changepoints = None
 
         print('{} Preprocessing Initialized. Data covers {} to {}.'.format(self.symbol,
-                                                                     self.min_date,
-                                                                     self.max_date))
+                                                                           self.min_date,
+                                                                           self.max_date))
     """
     Make sure start and end dates are in the range and can be
     converted to pandas datetimes. Returns dates in the correct format
     """
     def handle_dates(self, start_date, end_date):
-
 
         # Default start and end date are the beginning and end of data
         if start_date is None:
@@ -509,9 +508,10 @@ class Magic():
             This method is for storing an output for the predict_future method.
             Create softmax probability for whether player should buy hold or sell
         '''
-
         def softmax(x):
-            """Compute softmax values for each sets of scores in x."""
+            """
+            Compute softmax values for each sets of scores in x.
+            """
             e_x = np.exp(x - np.max(x))
             return e_x / e_x.sum(axis=0)
 
@@ -541,7 +541,6 @@ class Magic():
             This method is for storing an output for the predict_future method.
             Create softmax probability for whether player should buy hold or sell
         '''
-
         def softmax(x):
             """Compute softmax values for each sets of scores in x."""
             e_x = np.exp(x - np.max(x))
