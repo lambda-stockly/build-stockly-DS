@@ -1,0 +1,7 @@
+alpha-vantage==2.1.0
+fbprophet==0.5
+gensim==3.7.3
+nltk==3.4.1
+pandas==0.24.2
+tweepy==3.7.0
+Flask==1.0.3
