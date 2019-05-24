@@ -6,6 +6,10 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
+alpha-vantage = "*"
+pandas = "*"
+numpy = "*"
+flask = "*"
 
 [requires]
 python_version = "3.7"
