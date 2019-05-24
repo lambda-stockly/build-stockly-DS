@@ -6,6 +6,9 @@
 - update repo with app.py
 - install dependencies to pipenv
 - commit changes to heroku
+- deleted Pipfile, install dependencies via `requirements.txt`
+
+`pip install requirements.txt`
 
 ## Historical/Future Usage
 
