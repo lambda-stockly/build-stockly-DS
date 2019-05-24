@@ -2,8 +2,6 @@ import pandas as pd
 import numpy as np
 import os
 import tweepy
-import re
-import basilica
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
@@ -27,8 +25,6 @@ class TwitterSentiment():
         self.api = tweepy.API(TWITTER_AUTH)
 
         # Basilica.ai
-        BASILICA = basilica.Connection(os.getenv('BASILICA'))
-        self.basilica = BASILICA
         self.ticker = ticker.upper()
         self.sid = SentimentIntensityAnalyzer()
 
