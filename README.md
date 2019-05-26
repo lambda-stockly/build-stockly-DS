@@ -1,5 +1,10 @@
 # build-stockly-DS
 
+### Lambda School Data Scientists 
+
+### @Ruwai 'Chris L.'
+### @derek-shing 'Derek S.'
+
 # TODOs:
 
 - Clean up repo
